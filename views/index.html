@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicio de Lavado de Autos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #003366; 
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1, h2, h3 {
+            margin: 0;
+        }
+        form, .message, table {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            padding: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="checkbox"] {
+            margin-bottom: 15px;
+        }
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #cc0000;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #b30000; 
+        }
+        a {
+            color: #003366; 
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+        th {
+            background-color: #003366; 
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Servicio de Lavado de Autos</h1>
+    </header>
+
+    
+    <form id="carWashForm" action="#" method="POST" onsubmit="handleOrder(event)">
+        <h2>Datos del Vehículo</h2>
+        <label for="owner">Propietario:</label>
+        <input type="text" name="owner" id="owner" required>
+
+        <label for="brand">Marca:</label>
+        <input type="text" name="brand" id="brand" required>
+
+        <label for="model">Modelo:</label>
+        <input type="text" name="model" id="model" required>
+
+        <label for="plate">Placa:</label>
+        <input type="text" name="plate" id="plate" required>
+
+        <label for="color">Color:</label>
+        <input type="text" name="color" id="color" required>
+
+        <h2>Servicios de Lavado</h2>
+        <label><input type="checkbox" name="simpleWash" value="5"> Lavado sencillo ($5)</label>
+        <label><input type="checkbox" name="wax" value="5"> Cera ($5)</label>
+        <label><input type="checkbox" name="interiorCleaning" value="8"> Limpieza interior ($8)</label>
+        <label><input type="checkbox" name="tireWash" value="3"> Lavado de llantas ($3)</label>
+        <label><input type="checkbox" name="engineCleaning" value="12"> Limpieza de motor ($12)</label>
+        <label><input type="checkbox" name="underbodyWash" value="7"> Lavado de chasis ($7)</label>
+
+        <button type="submit">Realizar Pedido</button>
+    </form>
+
+    
+    <div id="orderHistory" style="display:none;">
+        <h2>Historial de Lavados</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Propietario</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Placa</th>
+                    <th>Color</th>
+                    <th>Servicios</th>
+                    <th>Precio Total</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                
+            </tbody>
+        </table>
+        <button onclick="showForm()">Volver a Realizar Pedido</button>
+    </div>
+
+    
+    <div id="orderSuccess" style="display:none;" class="message">
+        <h2>¡Gracias por su pedido!</h2>
+        <p>Su lavado de auto se ha solicitado exitosamente.</p>
+        <button onclick="showHistory()">Ver Historial de Lavados</button>
+        <button onclick="showForm()">Volver al Inicio</button>
+    </div>
+
+    <footer>
+        <p>© 2024 Servicio de Lavado de Autos</p>
+    </footer>
+
+    <script>
+        const orders = [];
+
+        function handleOrder(event) {
+            event.preventDefault(); 
+
+            
+            const owner = document.getElementById('owner').value;
+            const brand = document.getElementById('brand').value;
+            const model = document.getElementById('model').value;
+            const plate = document.getElementById('plate').value;
+            const color = document.getElementById('color').value;
+
+           
+            let totalPrice = 0;
+            const services = [];
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => {
+                totalPrice += parseFloat(checkbox.value); 
+                services.push(checkbox.parentNode.textContent.trim()); 
+            });
+
+           
+            orders.push({ owner, brand, model, plate, color, services, totalPrice });
+
+            
+            document.getElementById('carWashForm').style.display = 'none';
+            document.getElementById('orderSuccess').style.display = 'block';
+            updateHistory();
+        }
+
+        function updateHistory() {
+            const historyBody = document.getElementById('historyBody');
+            historyBody.innerHTML = '';
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.owner}</td>
+                    <td>${order.brand}</td>
+                    <td>${order.model}</td>
+                    <td>${order.plate}</td>
+                    <td>${order.color}</td>
+                    <td>${order.services.join(", ")}</td>
+                    <td>$${order.totalPrice}</td>
+                `;
+                historyBody.appendChild(row);
+            });
+        }
+
+        function showHistory() {
+            document.getElementById('orderSuccess').style.display = 'none';
+            document.getElementById('orderHistory').style.display = 'block';
+        }
+
+        function showForm() {
+            document.getElementById('orderHistory').style.display = 'none';
+            document.getElementById('orderSuccess').style.display = 'none';
+            document.getElementById('carWashForm').style.display = 'block';
+            document.getElementById('carWashForm').reset(); 
+        }
+    </script>
+</body>
+</html>
